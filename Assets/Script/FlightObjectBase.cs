@@ -6,17 +6,22 @@ public class FlightObjectBase : MonoBehaviour {
 	protected float angle = 0;
 	protected float anglespeed = 0;
 	protected float angleacc = 0.1f;
+	protected float angledownacc = 0.1f;
 	protected float acc = 5f;
 	protected bool isTurn = false;
 	protected bool isTouch = false;
 	protected float angleX = 0;
+	protected float maxHeight = 20;
+
+	protected int body = 0;
+	protected int wing = 0;
+	protected int hp = 3;
+
 	public GameObject looksBasePrefab;
 	public GameObject HitEffect;
 	public GameObject DestroyEffect;
 	//public GameObject looksRotateXPrefab;
-	int body = 0;
-	int wing = 0;
-	int hp = 3;
+
 	protected List<GameObject> looksBase = new List<GameObject>();
 	protected List<GameObject> looksRotateX= new List<GameObject>();
 	public GameObject Bullet;
@@ -25,7 +30,7 @@ public class FlightObjectBase : MonoBehaviour {
 	protected Rigidbody2D rigidbody;
 	protected Vector2 velocity;
 
-	protected float loopX = 20f;
+	protected float loopX = 40f;
 	int destroyTime = 0;
 	// Use this for initialization
 	void Start () {
@@ -57,16 +62,28 @@ public class FlightObjectBase : MonoBehaviour {
 					isTurn = false;
 				} else {
 					isTurn = true;
+
 				}
 			}
+			if (isTouch) {
+				anglespeed += angleacc;
+			}else {
+				Gravity (-angledownacc);
+			}
 			if (isTurn == false) {
-				angleX = Mathf.Lerp (angleX, 0, Time.deltaTime * 3);
+				if (isTouch)
+					angleX = Mathf.Lerp (angleX, 0, Time.deltaTime * 3);
+				else {
+					angleX = Mathf.Lerp (angleX, (Mathf.Cos (angle * Mathf.PI / 180)-1)*90, Time.deltaTime * 3);
+				}
 			} else {
-				angleX = Mathf.Lerp (angleX, 180, Time.deltaTime * 3);
+				if (isTouch)
+					angleX = Mathf.Lerp (angleX, -180, Time.deltaTime * 3);
+				else {
+					angleX = Mathf.Lerp (angleX, (Mathf.Cos (angle * Mathf.PI / 180)-1)*90, Time.deltaTime * 3);
+				}
 			}
-			if (!isTouch) {
-				Gravity (-angleacc);
-			}
+
 			Move ();
 
 
@@ -88,6 +105,12 @@ public class FlightObjectBase : MonoBehaviour {
 			}
 			if (transform.position.x > loopX) {
 				transform.position -= new Vector3 (loopX * 2, 0, 0);
+			}
+			//takasaseigen
+			if (rigidbody.velocity.y > 0) {
+				float ex = (maxHeight - transform.position.y) > 3 ? 1 : (maxHeight - transform.position.y)/3;
+				rigidbody.velocity = new Vector2 (rigidbody.velocity.x, rigidbody.velocity.y * ex);
+				Gravity ((1 - ex) * -angledownacc);
 			}
 		} else {
 			rigidbody.velocity = Vector2.zero;

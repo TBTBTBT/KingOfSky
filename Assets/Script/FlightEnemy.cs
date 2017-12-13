@@ -9,8 +9,6 @@ public class FlightEnemy : FlightObjectBase {
 		}
 	}
 	void TouchMove(int num){
-
-		anglespeed += angleacc;
 		isTouch = true;
 		if (bulletTime > bulletSpan) {
 			for (int i = 0; i < 3; i++) {
