@@ -12,7 +12,14 @@ public class UtilityBehaviour : MonoBehaviour {
 		float rad = Mathf.Atan2(dy, dx);
 		return rad * Mathf.Rad2Deg;
 	}
+	Vector2 velbuffer;
+	public void Stop(){
+		
+		velbuffer = GetComponent<Rigidbody2D> ().velocity;
+		GetComponent<Rigidbody2D> ().velocity = Vector2.zero;
+	}
 }
+
 public class TickEvent{
 	public delegate void callBack ();
 	List<callBack> c = new List<callBack>();

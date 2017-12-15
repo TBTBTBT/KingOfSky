@@ -15,6 +15,8 @@ public class FlightObjectBase : MonoBehaviour {
 
 	protected int body = 0;
 	protected int wing = 0;
+	protected float maxAcc = 10f;
+	protected float minAcc = 4f;
 	protected int hp = 3;
 
 	public GameObject looksBasePrefab;
@@ -52,8 +54,25 @@ public class FlightObjectBase : MonoBehaviour {
 	}
 	protected virtual void ExtendFixedUpdate(){
 	}
+	protected void AutoPilot(){
+		anglespeed = 0;
+		angle = Mathf.Lerp (angle, 0, Time.deltaTime * 3);
+	}
+	void AccAdd(){
+		float sin = Mathf.Sin (angle * Mathf.PI / 180);
+		if (sin< 0) {
+			if (acc < maxAcc)
+				acc -= sin/15;
+			if(acc >= maxAcc) acc = maxAcc;
+		} else {
+			if (acc > minAcc)
+				acc -= sin/15;
+			if(acc <= minAcc) acc = minAcc;
+		}
+	}
 	// Update is called once per frame
 	void FixedUpdate () { 
+		//AccAdd ();
 		if (hp > 0) {
 			if (bulletTime <= bulletSpan)
 				bulletTime++;
